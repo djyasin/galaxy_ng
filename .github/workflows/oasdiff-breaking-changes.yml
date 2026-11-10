@@ -1,0 +1,32 @@
+---
+# oasdiff breaking change detection — standardized caller.
+# Spec is committed to the repo; baseline extracted via git show.
+# Consumes reusable workflow from ansible/actions (PR #161).
+# Jira: AAP-86436
+name: "API: Breaking Change Detection"
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'stable-*'
+      - '!stable-2.4'
+      - AAP-86436/**
+    paths:
+      - 'galaxy_ng/app/static/galaxy.json'
+      - '.github/workflows/oasdiff-breaking-changes*.yml'
+
+concurrency:
+  group: oasdiff-breaking-changes-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  detect:
+    # djyasin/actions for test; production: ansible/actions@<tag>
+    uses: djyasin/actions/.github/workflows/oasdiff-detect-breaking-changes.yml@feat/oasdiff-breaking-change-detection # PR #161
+    with:
+      spec-path: galaxy_ng/app/static/galaxy.json
