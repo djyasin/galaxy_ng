@@ -11,6 +11,9 @@ on:
       - 'stable-*'
       - '!stable-2.4'
       - AAP-86436/**
+    paths:
+      - 'galaxy_ng/app/static/galaxy.json'
+      - 'changelogs/fragments/**'
 
 permissions:
   contents: read
