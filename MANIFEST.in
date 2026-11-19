@@ -28,6 +28,5 @@ exclude codecov.yml
 exclude sonar-project.properties
 exclude tox.ini
 prune .tekton
-recursive-include changelogs *.gitkeep
 exclude AGENTS.md
 exclude CLAUDE.md
