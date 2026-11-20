@@ -132,13 +132,20 @@ jobs:
       - name: Check for breaking changes vs central
         if: steps.drift_diff.outputs.drift_detected == 'true'
         run: |
-          BREAKING_OUTPUT=$(oasdiff breaking \
-            spec-repo/galaxy.json \
-            galaxy_ng/app/static/galaxy.json \
-            --format text 2>&1) || true
-          if [ -n "$BREAKING_OUTPUT" ]; then
+          # oasdiff's text output is nonempty even when there are no breaking
+          # changes ("No breaking changes to report, but the specs are
+          # different."), so output emptiness cannot signal breaking changes.
+          # --fail-on ERR makes oasdiff exit 1 only when error-level breaking
+          # changes are actually found.
+          if ! oasdiff breaking \
+              spec-repo/galaxy.json \
+              galaxy_ng/app/static/galaxy.json \
+              --format text \
+              --fail-on ERR > /tmp/breaking-output.txt 2>&1; then
             echo "::warning::Breaking changes detected vs central spec:"
-            echo "$BREAKING_OUTPUT"
+            cat /tmp/breaking-output.txt
+          else
+            echo "Spec drift detected, but no breaking changes vs central spec."
           fi
 
   # ── Sync spec to central repo on merge ───────────────────────────────
